@@ -10,40 +10,53 @@ export interface PlaceResult {
   user_ratings_total?: number;
   location: { lat: number; lng: number };
   photo_reference?: string;
+  website?: string;
+  googleMapsUrl: string;
 }
 
 export interface FetchPlacesOptions {
-  query: string; // ex: "restaurant italian"
-  location?: { lat: number; lng: number }; // opțional, pentru căutare localizată
-  radius?: number; // în metri, ex: 3000 pentru 3km
-  minRating?: number; // ex: 4.0
-  maxPriceLevel?: number; // 0 (ieftin) - 4 (scump)
+  query: string;
+  location?: { lat: number; lng: number };
+  radius?: number;
+  minRating?: number;
+  maxPriceLevel?: number;
 }
 
 export async function fetchPlacesFromMaps(options: FetchPlacesOptions): Promise<PlaceResult[]> {
   const { query, location, radius = 3000, minRating = 0, maxPriceLevel } = options;
-  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
 
-  if (!apiKey) throw new Error('GOOGLE_PLACES_API_KEY is not set in .env.local');
+  if (!apiKey) throw new Error('NEXT_PUBLIC_GOOGLE_PLACES_API_KEY is not set');
 
-  // Construiește URL-ul pentru Places Text Search
+  // Text Search request
   let url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`;
-  if (location) {
-    url += `&location=${location.lat},${location.lng}&radius=${radius}`;
-  }
+  if (location) url += `&location=${location.lat},${location.lng}&radius=${radius}`;
 
-  // Apelează API-ul
   const response = await axios.get(url);
-  const results = response.data.results as any[];
+  const results = response.data.results;
 
-  // Filtrare după rating și preț
-  let filtered = results.filter((place) => {
-    const ratingOK = !minRating || (place.rating && place.rating >= minRating);
-    const priceOK = maxPriceLevel === undefined || (place.price_level !== undefined && place.price_level <= maxPriceLevel);
+  // Get details for each place
+  const placesWithDetails = await Promise.all(
+    results.map(async (place: any) => {
+      const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=website,url&key=${apiKey}`;
+      const detailsResponse = await axios.get(detailsUrl);
+      
+      return {
+        ...place,
+        website: detailsResponse.data.result?.website,
+        googleMapsUrl: detailsResponse.data.result?.url || `https://www.google.com/maps/place/?q=place_id:${place.place_id}`
+      };
+    })
+  );
+
+  // Filtrare
+  const filtered = placesWithDetails.filter((place) => {
+    const ratingOK = place.rating >= minRating;
+    const priceOK = maxPriceLevel === undefined || (place.price_level <= maxPriceLevel);
     return ratingOK && priceOK;
   });
 
-  // Mapare la structura proprie
+  // Mapare rezultate
   return filtered.map((place) => ({
     place_id: place.place_id,
     name: place.name,
@@ -54,5 +67,7 @@ export async function fetchPlacesFromMaps(options: FetchPlacesOptions): Promise<
     user_ratings_total: place.user_ratings_total,
     location: place.geometry.location,
     photo_reference: place.photos?.[0]?.photo_reference,
+    website: place.website,
+    googleMapsUrl: place.googleMapsUrl
   }));
 }
