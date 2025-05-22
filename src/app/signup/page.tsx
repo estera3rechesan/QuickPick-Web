@@ -29,7 +29,7 @@ export default function SignupPage() {
     } else {
       setSuccessMsg('Cont creat! Verifică emailul pentru confirmare.');
       // Poți redirecționa automat după câteva secunde, dacă vrei:
-      // setTimeout(() => router.push('/login'), 2000);
+      setTimeout(() => router.push('/login'), 2000);
     }
   };
 

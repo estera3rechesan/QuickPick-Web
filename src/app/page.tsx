@@ -23,7 +23,7 @@ export default function Home() {
 
       {/* Eventual, un mic hint sau exemplu sub search */}
       <p className="mt-6 text-[#353935] text-base text-center">
-        Exemplu: <span className="font-semibold">restaurant italian ieftin aproape de mine</span>
+        Exemplu: <span className="font-semibold">restaurant italian 100 lei Timisoara</span>
       </p>
     </main>
   );

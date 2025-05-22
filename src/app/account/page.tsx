@@ -67,10 +67,16 @@ export default function AccountPage() {
   }
 
   async function handleDeleteHistory(id: number) {
-    const { error } = await supabase.from("search_history").delete().eq("id", id);
-    if (!error) setHistory(history.filter(h => h.id !== id));
-    else alert("Eroare la ștergere: " + error.message);
+  // Șterge din Supabase
+  const { error } = await supabase.from("search_history").delete().eq("id", id);
+  if (!error) {
+    // Șterge și din state local (dispare instant din UI)
+    setHistory(history.filter(h => h.id !== id));
+  } else {
+    alert("Eroare la ștergere: " + error.message);
   }
+}
+
 
 return (
   <main className="max-w-2xl mx-auto p-4">
