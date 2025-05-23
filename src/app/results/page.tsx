@@ -19,12 +19,15 @@ export default async function ResultsPage({ searchParams }: { searchParams: any 
 
   // 4. Afișează rezultatele
   return (
-    <main className="min-h-screen bg-[#FFECEC] p-4">
+  <main className="pt-18 min-h-screen bg-[#FFECEC] p-4">
+    <div className="max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold text-[#353935] mb-4 text-center">
         Rezultate pentru: <span className="text-[#FF8787]">{query}</span>
       </h1>
       <ResultsList places={places || []} />
-    </main>
-  );
+    </div>
+  </main>
+);
+
 }
 

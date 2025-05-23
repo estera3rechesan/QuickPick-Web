@@ -95,9 +95,10 @@ export default function LocationCard(props: LocationCardProps) {
           alt={name}
           width={112}
           height={112}
-          className="object-cover"
+          className="object-cover w-full h-full"
         />
       </div>
+
 
       <div className="flex-1">
         {/* Nume cu link */}
@@ -124,7 +125,7 @@ export default function LocationCard(props: LocationCardProps) {
           )}
 
           {price_level !== undefined && (
-            <span className="text-[#FF8787]">{getPriceRange(price_level)}</span>
+            <span className="text-[#353935]">{getPriceRange(price_level)}</span>
           )}
         </div>
 
@@ -157,12 +158,21 @@ export default function LocationCard(props: LocationCardProps) {
         <div className="mt-3">
           {!reviewSummary && !reviewLoading && (
             <button
-              className="bg-[#FF8787] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#ffb0b0] transition"
-              onClick={handleGenerateReviewSummary}
-              disabled={reviewLoading}
-            >
-              Generează rezumat recenzii
-            </button>
+  className="
+    bg-black text-white
+    px-3 py-1
+    text-sm
+    rounded-full font-semibold
+    transition
+    border-2 border-black
+    hover:bg-white hover:text-black
+  "
+  onClick={handleGenerateReviewSummary}
+  disabled={reviewLoading}
+>
+  Recenzii pe scurt
+</button>
+
           )}
           {reviewLoading && (
             <div className="flex items-center gap-2 mt-2">

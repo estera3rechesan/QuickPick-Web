@@ -1,12 +1,11 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import LocationCard, { LocationCardProps } from "./LocationCard";
 
 interface ResultsListProps {
   places: LocationCardProps[];
 }
 
-// Dacă ai lat/lng în altă structură, modifică aici!
 function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -21,26 +20,18 @@ function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   return R * c;
 }
 
-export default function ResultsList({ places }: ResultsListProps) {
-  const [sortBy, setSortBy] = useState<"rating" | "price" | "distance" | null>(null);
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [sortedPlaces, setSortedPlaces] = useState<LocationCardProps[]>(places);
+// Filtrele cu două opțiuni pentru preț
+const FILTERS = [
+  { key: "rating", label: "Rating" },
+  { key: "price_asc", label: "Preț crescător" },
+  { key: "price_desc", label: "Preț descrescător" },
+  { key: "distance", label: "Distanță" },
+];
 
-  // Dropdown close on click outside
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+export default function ResultsList({ places }: ResultsListProps) {
+  const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc" | "distance" | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [sortedPlaces, setSortedPlaces] = useState<LocationCardProps[]>(places);
 
   // Obține coordonatele userului când selectezi "distanță"
   useEffect(() => {
@@ -57,10 +48,11 @@ export default function ResultsList({ places }: ResultsListProps) {
     let newPlaces = [...places];
     if (sortBy === "rating") {
       newPlaces.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    } else if (sortBy === "price") {
+    } else if (sortBy === "price_asc") {
       newPlaces.sort((a, b) => (a.price_level || 0) - (b.price_level || 0));
+    } else if (sortBy === "price_desc") {
+      newPlaces.sort((a, b) => (b.price_level || 0) - (a.price_level || 0));
     } else if (sortBy === "distance" && coords) {
-      // Verifică dacă ai lat/lng pe fiecare place (modifică dacă structura diferă!)
       newPlaces = newPlaces
         .map(place => {
           const lat = (place as any).lat || (place as any).latitude;
@@ -81,40 +73,40 @@ export default function ResultsList({ places }: ResultsListProps) {
   }
 
   return (
-    <div>
-      {/* Dropdown filtrare */}
-      <div className="relative inline-block text-left mb-4" ref={dropdownRef}>
-        <button
-          className="bg-[#FF8787] text-white px-4 py-2 rounded-lg font-semibold"
-          onClick={() => setShowDropdown((v) => !v)}
-        >
-          Filtrează după
-        </button>
-        {showDropdown && (
-          <div className="absolute mt-2 w-40 rounded-md shadow-lg bg-white z-10">
-            <button
-              className="block w-full text-left px-4 py-2 hover:bg-[#FFECEC]"
-              onClick={() => { setSortBy('rating'); setShowDropdown(false); }}
-            >
-              Rating
-            </button>
-            <button
-              className="block w-full text-left px-4 py-2 hover:bg-[#FFECEC]"
-              onClick={() => { setSortBy('price'); setShowDropdown(false); }}
-            >
-              Preț
-            </button>
-            <button
-              className="block w-full text-left px-4 py-2 hover:bg-[#FFECEC]"
-              onClick={() => { setSortBy('distance'); setShowDropdown(false); }}
-            >
-              Distanță
-            </button>
-          </div>
-        )}
-      </div>
+    <div className="flex w-full max-w-5xl mx-auto">
+      {/* Sidebar de filtrare */}
+      <aside className="hidden md:flex flex-col gap-2 w-52 mr-8 pt-2 sticky top-14 h-fit bg-white/80 rounded-xl shadow">
+        <h3 className="text-[#353935] font-bold mb-2 px-4 pt-4">Filtrează după</h3>
+        {FILTERS.map((filter) => (
+          <button
+            key={filter.key}
+            className={`text-left px-4 py-2 rounded-lg font-medium transition
+              ${sortBy === filter.key
+                ? "bg-[#93c572] text-white"
+                : "hover:bg-[#c9e2b8] text-[#353935]"}
+            `}
+            onClick={() => setSortBy(filter.key as any)}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </aside>
       {/* Lista de rezultate */}
-      <div className="flex flex-col gap-6 mt-8">
+      <div className="flex-1 flex flex-col gap-6 mt-2">
+        {/* Pe mobil: dropdown pentru filtrare */}
+        <div className="md:hidden flex gap-2 mb-4">
+          <span className="text-[#353935] font-semibold">Filtrează după:</span>
+          <select
+            className="border px-2 py-1 rounded"
+            value={sortBy || ""}
+            onChange={e => setSortBy(e.target.value as any)}
+          >
+            <option value="">--</option>
+            {FILTERS.map(f => (
+              <option key={f.key} value={f.key}>{f.label}</option>
+            ))}
+          </select>
+        </div>
         {sortedPlaces.map((place, idx) => (
           <LocationCard key={place.name + idx} {...place} />
         ))}

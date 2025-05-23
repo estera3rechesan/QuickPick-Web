@@ -16,7 +16,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-[#FFECEC] p-4">
+    <main className="pt-24 flex flex-col items-center justify-center min-h-screen bg-[#FFECEC] p-4">
       {/* Logo și titlu */}
       <div className="flex flex-col items-center mb-8">
         <Image
@@ -28,14 +28,16 @@ export default function Home() {
           priority
         />
         <h1 className="text-4xl font-bold text-[#353935] mb-1">QuickPick</h1>
-        <p className="text-lg text-[#353935]">Descoperă și alege rapid ce te interesează!</p>
+        <p className="text-lg text-[#353935]">Scrii ce vrei. Găsești ce-ți trebuie.</p>
       </div>
 
       {/* Search Bar */}
       <SearchInput query={query} setQuery={setQuery} />
 
       {/* Mood search sub search bar */}
-      <MoodSearch onMoodSelect={handleMoodPrompt} />
+      <div className="mt-3">
+        <MoodSearch onMoodSelect={handleMoodPrompt} />
+      </div>
     </main>
   );
 }

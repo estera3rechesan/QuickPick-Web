@@ -123,7 +123,7 @@ export default function AccountPage() {
   };
 
   return (
-    <main className="flex flex-col md:flex-row max-w-5xl mx-auto p-4 gap-8">
+    <main className="pt-18 flex flex-col md:flex-row max-w-5xl mx-auto p-4 gap-8">
       {/* MENIU LATERAL */}
       <nav className="md:w-56 flex-shrink-0 mb-6 md:mb-0">
         <ul className="flex md:flex-col gap-4 md:gap-2">
