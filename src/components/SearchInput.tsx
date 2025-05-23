@@ -1,48 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
-
 interface SearchInputProps {
   query: string;
   setQuery: (q: string) => void;
+  onSearch: () => void;
+  loading: boolean;
 }
 
-export default function SearchInput({ query, setQuery }: SearchInputProps) {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  // Dacă vrei să sincronizezi promptul cu URL-ul (opțional)
-  useEffect(() => {
-    const queryFromUrl = searchParams.get('query') || '';
-    if (queryFromUrl && queryFromUrl !== query) {
-      setQuery(queryFromUrl);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+export default function SearchInput({ query, setQuery, onSearch, loading }: SearchInputProps) {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim().length === 0) return;
-    setLoading(true);
-
-    // Fetch către API-ul tău cu credentials: "include"
-    const res = await fetch("/api/searchPlaces", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: query }),
-      credentials: "include", // <-- esențial!
-    });
-    const data = await res.json();
-    setResults(data.places || []);
-    setLoading(false);
-
-    // Redirect către pagina de rezultate
-    router.push(`/results?query=${encodeURIComponent(query)}`);
+    onSearch();
   };
 
   return (
@@ -62,12 +31,12 @@ export default function SearchInput({ query, setQuery }: SearchInputProps) {
         />
         <button
           type="submit"
+          disabled={loading}
           className="px-6 py-3 bg-[#FF8787] hover:bg-[#ffb0b0] text-[#353935] font-bold rounded-lg transition text-lg"
         >
-          Caută
+          {loading ? "Caută..." : "Caută"}
         </button>
       </form>
-      {/* Loader animat sub search */}
       {loading && (
         <div className="flex justify-center w-full mt-4">
           <svg

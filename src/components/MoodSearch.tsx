@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import {
   FaBook,
   FaHeart,
@@ -13,7 +12,6 @@ import {
   FaPalette,
   FaGlassCheers,
   FaMoneyBillWave,
-  FaPlus,
 } from "react-icons/fa";
 import { MdFamilyRestroom } from "react-icons/md";
 
@@ -27,21 +25,21 @@ const moods = [
   {
     label: "Familie & Copii",
     prompt:
-      "Recomandă locuri de petrecut timpul cu familia, potrivite pentru copii, fără spitale, clinici sau locuri medicale.",
+      "Recomandă locuri de petrecut timpul cu familia, potrivite pentru copii, cum ar fi parcuri, locuri de joaca, restaurante cu spatiu pentru copii.",
     icon: <MdFamilyRestroom className={iconClass} />,
-    description: "Locuri sigure și distractive pentru copii și părinți.",
+    description: "Locuri distractive pentru copii și părinți.",
   },
   {
     label: "Romantic",
     prompt:
-      "Recomandă locuri romantice pentru cupluri, cu atmosferă plăcută și liniștită, evită locurile aglomerate sau nepotrivite.",
+      "Recomandă locuri romantice pentru cupluri, cu atmosferă plăcută și liniștită, cum ar fi restaurante elegante, muzeuri, parcuri frumoase, sau locuri cu priveliști spectaculoase.",
     icon: <FaHeart className={iconClass} />,
     description: "Pentru cupluri, atmosferă intimă.",
   },
   {
     label: "Prieteni & Socializare",
     prompt:
-      "Recomandă locuri potrivite pentru socializare cu prietenii, cu atmosferă relaxată și prietenoasă.",
+      "Recomandă locuri potrivite pentru socializare cu prietenii, cu atmosferă relaxată și prietenoasă, cum ar fi cafenele, bistrouri, fast-food-uri, baruri, locuri cu jocuri de societate, sau locuri cu activități interactive.",
     icon: <FaUsers className={iconClass} />,
     description: "Pentru grupuri, atmosferă relaxată.",
   },
@@ -69,21 +67,21 @@ const moods = [
   {
     label: "Pet Friendly",
     prompt:
-      "Recomandă locuri unde animalele de companie sunt binevenite.",
+      "Recomandă locuri unde animalele de companie sunt binevenite, cum ar fi restaurante sau cafenele.",
     icon: <FaPaw className={iconClass} />,
     description: "Locuri unde poți merge cu animalele de companie.",
   },
   {
     label: "Cafenea & Relaxare",
     prompt:
-      "Recomandă cafenele sau ceainării cu atmosferă relaxantă, potrivite pentru citit sau lucrat.",
+      "Recomandă cafenele sau ceainării cu atmosferă relaxantă, cum ar fi cafenele de specialitate și ceainării.",
     icon: <FaCoffee className={iconClass} />,
     description: "Cafenele, ceainării, locuri liniștite.",
   },
   {
     label: "Citit",
     prompt:
-      "Recomandă un loc liniștit și confortabil pentru citit, cu atmosferă relaxantă.",
+      "Recomandă un loc liniștit și confortabil pentru citit, cum ar fi cafenele, ceainării, biblioteci, librării.",
     icon: <FaBook className={iconClass} />,
     description: "Locuri liniștite pentru citit.",
   },
@@ -104,23 +102,20 @@ const moods = [
   {
     label: "Noapte & Distracție",
     prompt:
-      "Recomandă baruri, cluburi sau locuri pentru distracție de noapte, evită locurile pentru copii.",
+      "Recomandă baruri, cluburi sau locuri pentru distracție de noapte.",
     icon: <FaGlassCheers className={iconClass} />,
     description: "Baruri, cluburi, viață de noapte.",
   },
   {
     label: "Buget redus",
     prompt:
-      "Recomandă locuri bune cu prețuri accesibile, potrivite pentru un buget redus.",
+      "Recomandă locuri bune cu prețuri accesibile, potrivite pentru un buget redus, cum ar fi fast-food-uri, restaurante ieftine, muzee gratuite, parcuri.",
     icon: <FaMoneyBillWave className={iconClass} />,
     description: "Opțiuni accesibile, prețuri mici.",
   },
 ];
 
 export default function MoodSearch({ onMoodSelect }: MoodSearchProps) {
-  const [showCustom, setShowCustom] = useState(false);
-  const [customPrompt, setCustomPrompt] = useState("");
-
   return (
     <div className="w-full max-w-4xl mx-auto mt-10 text-center">
       <h3 className="text-[#353935] font-bold text-2xl mb-5">Mood search</h3>
@@ -138,46 +133,7 @@ export default function MoodSearch({ onMoodSelect }: MoodSearchProps) {
             <span className="text-xs text-[#353935] opacity-70 mt-1 text-center">{mood.description}</span>
           </button>
         ))}
-        {/* Buton Personalizează */}
-        <button
-          className="flex flex-col items-center bg-white rounded-xl shadow px-5 py-4 hover:bg-[#c9e2b8] transition w-40 h-36 justify-center"
-          onClick={() => setShowCustom((v) => !v)}
-          type="button"
-          title="Creează un prompt personalizat"
-        >
-          <span className={iconClass}><FaPlus /></span>
-          <span className="font-semibold mt-2 text-[#353935] text-lg">Personalizează</span>
-          <span className="text-xs text-[#353935] opacity-70 mt-1 text-center">Creează promptul tău</span>
-        </button>
       </div>
-      {showCustom && (
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            if (customPrompt.trim()) {
-              onMoodSelect(customPrompt.trim());
-              setShowCustom(false);
-              setCustomPrompt("");
-            }
-          }}
-          className="flex gap-2 mt-2 justify-center"
-        >
-          <input
-            type="text"
-            className="flex-1 max-w-xs px-4 py-2 border-2 border-[#89AC46] rounded-lg bg-white text-[#353935] focus:outline-none focus:ring-2 focus:ring-[#D3E671] transition text-base"
-            placeholder="Scrie promptul tău..."
-            value={customPrompt}
-            onChange={e => setCustomPrompt(e.target.value)}
-            autoFocus
-          />
-          <button
-            type="submit"
-            className="bg-[#FF8787] text-white rounded-lg px-4 py-2 font-semibold hover:bg-[#ffb0b0] transition"
-          >
-            Caută
-          </button>
-        </form>
-      )}
     </div>
   );
 }

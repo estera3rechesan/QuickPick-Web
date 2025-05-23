@@ -6,6 +6,7 @@ interface ResultsListProps {
   places: LocationCardProps[];
 }
 
+// Calculează distanța în km între două coordonate
 function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -20,7 +21,6 @@ function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   return R * c;
 }
 
-// Filtrele cu două opțiuni pentru preț
 const FILTERS = [
   { key: "rating", label: "Rating" },
   { key: "price_asc", label: "Preț crescător" },
@@ -46,27 +46,49 @@ export default function ResultsList({ places }: ResultsListProps) {
   // Sortează rezultatele după criteriul ales
   useEffect(() => {
     let newPlaces = [...places];
+
     if (sortBy === "rating") {
-      newPlaces.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      // Sortează descrescător după rating, ignoră undefined
+      newPlaces = newPlaces
+        .filter(p => typeof p.rating === "number")
+        .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     } else if (sortBy === "price_asc") {
-      newPlaces.sort((a, b) => (a.price_level || 0) - (b.price_level || 0));
+      // Sortează crescător după price_level, ignoră undefined
+      newPlaces = newPlaces
+        .filter(p => typeof p.price_level === "number")
+        .sort((a, b) => (a.price_level ?? 0) - (b.price_level ?? 0));
     } else if (sortBy === "price_desc") {
-      newPlaces.sort((a, b) => (b.price_level || 0) - (a.price_level || 0));
+      // Sortează descrescător după price_level, ignoră undefined
+      newPlaces = newPlaces
+        .filter(p => typeof p.price_level === "number")
+        .sort((a, b) => (b.price_level ?? 0) - (a.price_level ?? 0));
     } else if (sortBy === "distance" && coords) {
+      // Calculează distanța, filtrează doar locurile cu coordonate și la max 25 km
       newPlaces = newPlaces
         .map(place => {
-          const lat = (place as any).lat || (place as any).latitude;
-          const lng = (place as any).lng || (place as any).longitude;
+          const lat = (place as any).lat ?? (place as any).latitude;
+          const lng = (place as any).lng ?? (place as any).longitude;
           let distance = Infinity;
-          if (lat && lng) {
+          if (typeof lat === "number" && typeof lng === "number") {
             distance = getDistanceKm(coords.lat, coords.lng, lat, lng);
           }
           return { ...place, _distance: distance };
         })
-        .sort((a, b) => (a._distance || Infinity) - (b._distance || Infinity));
+        .filter(place => typeof place._distance === "number" && place._distance <= 25)
+        .sort((a, b) => (a._distance ?? Infinity) - (b._distance ?? Infinity));
     }
+
     setSortedPlaces(newPlaces);
   }, [sortBy, coords, places]);
+
+  // Mesaj dacă nu există locuri în apropiere la filtrarea pe distanță
+  if (sortBy === "distance" && coords && !sortedPlaces.length) {
+    return (
+      <p className="text-[#353935] text-center mt-8">
+        Nu am găsit rezultate în apropierea ta (maxim 25 km).
+      </p>
+    );
+  }
 
   if (!places.length) {
     return <p className="text-[#353935] text-center mt-8">Nu am găsit rezultate relevante.</p>;

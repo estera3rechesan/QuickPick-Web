@@ -2,16 +2,44 @@
 import Image from 'next/image';
 import SearchInput from '@/components/SearchInput';
 import MoodSearch from '@/components/MoodSearch';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Home() {
   const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
+  // Pentru refresh după login
+  useEffect(() => {
+    if (searchParams.get("refresh") === "1") {
+      window.history.replaceState({}, document.title, "/");
+      window.location.reload();
+    }
+  }, [searchParams]);
+
+  // Detectează query în URL (ex: când vii din istoric) și pornește căutarea automat
+  useEffect(() => {
+    const urlQuery = searchParams.get("query");
+    if (urlQuery && urlQuery !== query) {
+      setQuery(urlQuery);
+      setLoading(true);
+      router.push(`/results?query=${encodeURIComponent(urlQuery)}`);
+    }
+    // eslint-disable-next-line
+  }, [searchParams]);
+
+  // Pentru căutarea din search bar
+  const handleSearch = () => {
+    setLoading(true);
+    router.push(`/results?query=${encodeURIComponent(query)}`);
+  };
+
+  // Pentru mood search
   const handleMoodPrompt = (prompt: string) => {
     setQuery(prompt);
+    setLoading(true);
     router.push(`/results?query=${encodeURIComponent(prompt)}`);
   };
 
@@ -32,13 +60,17 @@ export default function Home() {
       </div>
 
       {/* Search Bar */}
-      <SearchInput query={query} setQuery={setQuery} />
+      <SearchInput
+        query={query}
+        setQuery={setQuery}
+        onSearch={handleSearch}
+        loading={loading}
+      />
 
       {/* Mood search sub search bar */}
-      <div className="mt-3">
+      <div className="mt-10 w-full flex justify-center">
         <MoodSearch onMoodSelect={handleMoodPrompt} />
       </div>
     </main>
   );
 }
-

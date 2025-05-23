@@ -14,6 +14,7 @@ export interface LocationCardProps {
   photo_reference?: string;
   googleMapsUrl: string;
   website?: string;
+  showFavorite?: boolean; // <-- adăugat!
 }
 
 export default function LocationCard(props: LocationCardProps) {
@@ -27,6 +28,7 @@ export default function LocationCard(props: LocationCardProps) {
     photo_reference,
     googleMapsUrl,
     website,
+    showFavorite = true, // <-- default true
   } = props;
 
   const photoUrl = photo_reference
@@ -73,7 +75,6 @@ export default function LocationCard(props: LocationCardProps) {
     setReviewError(null);
     setReviewLoading(true);
     try {
-      // Fetch reviews direct din API-ul tău (pe server, pentru acest place_id)
       const res = await fetch(`/api/reviewSummary`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -98,7 +99,6 @@ export default function LocationCard(props: LocationCardProps) {
           className="object-cover w-full h-full"
         />
       </div>
-
 
       <div className="flex-1">
         {/* Nume cu link */}
@@ -158,21 +158,20 @@ export default function LocationCard(props: LocationCardProps) {
         <div className="mt-3">
           {!reviewSummary && !reviewLoading && (
             <button
-  className="
-    bg-black text-white
-    px-3 py-1
-    text-sm
-    rounded-full font-semibold
-    transition
-    border-2 border-black
-    hover:bg-white hover:text-black
-  "
-  onClick={handleGenerateReviewSummary}
-  disabled={reviewLoading}
->
-  Recenzii pe scurt
-</button>
-
+              className="
+                bg-black text-white
+                px-3 py-1
+                text-sm
+                rounded-full font-semibold
+                transition
+                border-2 border-black
+                hover:bg-white hover:text-black
+              "
+              onClick={handleGenerateReviewSummary}
+              disabled={reviewLoading}
+            >
+              Recenzii pe scurt
+            </button>
           )}
           {reviewLoading && (
             <div className="flex items-center gap-2 mt-2">
@@ -194,29 +193,31 @@ export default function LocationCard(props: LocationCardProps) {
           )}
         </div>
 
-        {/* Inimioară favorite profesională */}
-        <div className="flex items-center gap-2 mt-2">
-          <button
-            onClick={handleSave}
-            disabled={saved || loading}
-            aria-label={saved ? "Locație salvată la favorite" : "Salvează ca favorit"}
-            className="p-1 rounded-full border-none bg-transparent hover:scale-110 transition"
-            style={{
-              color: saved ? "#FF8787" : "#ccc",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: 28,
-              lineHeight: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {saved ? <FaHeart /> : <FaRegHeart />}
-          </button>
-          <span className="text-sm text-[#353935]">
-            {saved ? "Salvat la favorite" : "Salvează ca favorit"}
-          </span>
-        </div>
+        {/* Inimioară favorite - doar dacă showFavorite !== false */}
+        {showFavorite && (
+          <div className="flex items-center gap-2 mt-2">
+            <button
+              onClick={handleSave}
+              disabled={saved || loading}
+              aria-label={saved ? "Locație salvată la favorite" : "Salvează ca favorit"}
+              className="p-1 rounded-full border-none bg-transparent hover:scale-110 transition"
+              style={{
+                color: saved ? "#FF8787" : "#ccc",
+                cursor: loading ? "not-allowed" : "pointer",
+                fontSize: 28,
+                lineHeight: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {saved ? <FaHeart /> : <FaRegHeart />}
+            </button>
+            <span className="text-sm text-[#353935]">
+              {saved ? "Salvat la favorite" : "Salvează ca favorit"}
+            </span>
+          </div>
+        )}
         {errorMsg && (
           <div className="text-red-600 text-sm mt-1">{errorMsg}</div>
         )}
