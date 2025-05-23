@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { FaHeart, FaRegHeart } from "react-icons/fa"; // Importă iconițele
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 export interface LocationCardProps {
   place_id: string;
@@ -40,6 +40,11 @@ export default function LocationCard(props: LocationCardProps) {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // ---- Lazy loading review summary ----
+  const [reviewSummary, setReviewSummary] = useState<string | null>(null);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+
   async function handleSave() {
     setErrorMsg(null);
     setLoading(true);
@@ -62,6 +67,24 @@ export default function LocationCard(props: LocationCardProps) {
       const data = await res.json();
       setErrorMsg(data.error || "Eroare la salvare!");
     }
+  }
+
+  async function handleGenerateReviewSummary() {
+    setReviewError(null);
+    setReviewLoading(true);
+    try {
+      // Fetch reviews direct din API-ul tău (pe server, pentru acest place_id)
+      const res = await fetch(`/api/reviewSummary`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ place_id }),
+      });
+      const data = await res.json();
+      setReviewSummary(data.summary);
+    } catch (e) {
+      setReviewError("Nu s-a putut genera rezumatul recenziilor.");
+    }
+    setReviewLoading(false);
   }
 
   return (
@@ -130,6 +153,37 @@ export default function LocationCard(props: LocationCardProps) {
           )}
         </div>
 
+        {/* Lazy review summary */}
+        <div className="mt-3">
+          {!reviewSummary && !reviewLoading && (
+            <button
+              className="bg-[#FF8787] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#ffb0b0] transition"
+              onClick={handleGenerateReviewSummary}
+              disabled={reviewLoading}
+            >
+              Generează rezumat recenzii
+            </button>
+          )}
+          {reviewLoading && (
+            <div className="flex items-center gap-2 mt-2">
+              <svg className="animate-spin h-5 w-5 text-[#89AC46]" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+              <span>Se generează rezumatul...</span>
+            </div>
+          )}
+          {reviewSummary && (
+            <div className="bg-[#F6F6F6] rounded p-3 mt-2">
+              <h4 className="font-semibold mb-1">Conform opiniilor foștilor clienți:</h4>
+              <pre className="whitespace-pre-line text-sm text-[#353935]">{reviewSummary}</pre>
+            </div>
+          )}
+          {reviewError && (
+            <div className="text-red-600 text-sm mt-1">{reviewError}</div>
+          )}
+        </div>
+
         {/* Inimioară favorite profesională */}
         <div className="flex items-center gap-2 mt-2">
           <button
@@ -165,13 +219,13 @@ export default function LocationCard(props: LocationCardProps) {
 function getPriceRange(priceLevel: number): string {
   switch (priceLevel) {
     case 0:
-      return "Gratis";
+      return "1-20";
     case 1:
-      return "10-30 lei";
+      return "30-50 lei";
     case 2:
-      return "30-60 lei";
+      return "50-70 lei";
     case 3:
-      return "60-100 lei";
+      return "70-90 lei";
     case 4:
       return "100+ lei";
     default:

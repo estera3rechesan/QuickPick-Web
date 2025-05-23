@@ -35,16 +35,16 @@ export async function fetchPlacesFromMaps(options: FetchPlacesOptions): Promise<
   const response = await axios.get(url);
   const results = response.data.results;
 
-  // Get details for each place
+  // Get details for each place (doar website și url)
   const placesWithDetails = await Promise.all(
     results.map(async (place: any) => {
       const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=website,url&key=${apiKey}`;
       const detailsResponse = await axios.get(detailsUrl);
-      
+
       return {
         ...place,
         website: detailsResponse.data.result?.website,
-        googleMapsUrl: detailsResponse.data.result?.url || `https://www.google.com/maps/place/?q=place_id:${place.place_id}`
+        googleMapsUrl: detailsResponse.data.result?.url || `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
       };
     })
   );
@@ -68,6 +68,6 @@ export async function fetchPlacesFromMaps(options: FetchPlacesOptions): Promise<
     location: place.geometry.location,
     photo_reference: place.photos?.[0]?.photo_reference,
     website: place.website,
-    googleMapsUrl: place.googleMapsUrl
+    googleMapsUrl: place.googleMapsUrl,
   }));
 }
