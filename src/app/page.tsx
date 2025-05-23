@@ -1,7 +1,20 @@
+"use client";
 import Image from 'next/image';
 import SearchInput from '@/components/SearchInput';
+import MoodSearch from '@/components/MoodSearch';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 
 export default function Home() {
+  const [query, setQuery] = useState('');
+  const router = useRouter();
+
+  const handleMoodPrompt = (prompt: string) => {
+    setQuery(prompt);
+    router.push(`/results?query=${encodeURIComponent(prompt)}`);
+  };
+
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-[#FFECEC] p-4">
       {/* Logo și titlu */}
@@ -19,12 +32,11 @@ export default function Home() {
       </div>
 
       {/* Search Bar */}
-      <SearchInput />
+      <SearchInput query={query} setQuery={setQuery} />
 
-      {/* Eventual, un mic hint sau exemplu sub search */}
-      <p className="mt-6 text-[#353935] text-base text-center">
-        Exemplu: <span className="font-semibold">restaurant italian 100 lei Timisoara</span>
-      </p>
+      {/* Mood search sub search bar */}
+      <MoodSearch onMoodSelect={handleMoodPrompt} />
     </main>
   );
 }
+
