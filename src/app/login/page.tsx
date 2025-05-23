@@ -4,12 +4,21 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Pentru resetare parolă
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetMsg, setResetMsg] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+
   const router = useRouter();
   const supabase = createClient();
 
@@ -29,6 +38,18 @@ export default function LoginPage() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    setResetMsg('');
+    setResetLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail);
+    setResetLoading(false);
+    if (error) {
+      setResetMsg(error.message);
+    } else {
+      setResetMsg('Ți-am trimis un email cu instrucțiuni de resetare a parolei!');
+    }
+  };
+
   // Funcție pentru refresh la click pe logo (opțional)
   const handleLogoClick = () => {
     setEmail('');
@@ -45,7 +66,7 @@ export default function LoginPage() {
         {/* Logo */}
         <button type="button" onClick={handleLogoClick} className="mb-4">
           <Image
-            src="/LogoQP_roz.png" // pune logo-ul tău în public/ ca LogoQP_roz.png
+            src="/LogoQP_roz.png"
             alt="QuickPick Logo"
             width={80}
             height={80}
@@ -68,15 +89,64 @@ export default function LoginPage() {
           required
         />
 
-        {/* Input Parolă */}
-        <input
-          type="password"
-          placeholder="Parolă"
-          className="w-full mb-4 px-4 py-2 border-2 border-[#89AC46] rounded-md text-[#353935] bg-white focus:outline-none focus:ring-2 focus:ring-[#D3E671] transition"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
+        {/* Input Parolă cu ochișor */}
+        <div className="relative w-full mb-2">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Parolă"
+            className="w-full px-4 py-2 border-2 border-[#89AC46] rounded-md text-[#353935] bg-white focus:outline-none focus:ring-2 focus:ring-[#D3E671] transition pr-10"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(v => !v)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#353935] bg-transparent border-none cursor-pointer"
+            tabIndex={-1}
+            aria-label={showPassword ? "Ascunde parola" : "Arată parola"}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
+
+        {/* Link "Ți-ai uitat parola?" */}
+        <div className="w-full flex justify-end mb-4">
+          <button
+            type="button"
+            className="text-[#89AC46] hover:underline text-sm"
+            onClick={() => setShowForgot(v => !v)}
+          >
+            Ți-ai uitat parola?
+          </button>
+        </div>
+
+        {/* Formular resetare parolă */}
+        {showForgot && (
+          <div className="w-full mb-4 bg-[#F6F6F6] rounded px-4 py-3">
+            <div className="flex flex-col gap-2">
+              <input
+                type="email"
+                placeholder="Email pentru resetare"
+                className="w-full px-3 py-2 border-2 border-[#89AC46] rounded-md text-[#353935] bg-white focus:outline-none focus:ring-2 focus:ring-[#D3E671] transition"
+                value={resetEmail}
+                onChange={e => setResetEmail(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                disabled={resetLoading}
+                onClick={handleForgotPassword}
+                className="bg-[#FF8787] hover:bg-[#ffb0b0] text-white font-bold rounded-md transition px-4 py-2 text-sm"
+              >
+                {resetLoading ? "Se trimite..." : "Trimite link de resetare"}
+              </button>
+              {resetMsg && (
+                <div className="text-center text-[#353935] text-sm mt-1">{resetMsg}</div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Mesaj eroare */}
         {errorMsg && (

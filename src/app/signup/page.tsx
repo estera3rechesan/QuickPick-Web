@@ -4,10 +4,12 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
@@ -28,7 +30,6 @@ export default function SignupPage() {
       setErrorMsg(error.message);
     } else {
       setSuccessMsg('Cont creat! Verifică emailul pentru confirmare.');
-      // Poți redirecționa automat după câteva secunde, dacă vrei:
       setTimeout(() => router.push('/login'), 2000);
     }
   };
@@ -62,6 +63,7 @@ export default function SignupPage() {
         <h1 className="text-3xl font-bold text-[#353935] mb-1">QuickPick</h1>
         <p className="text-base text-[#353935] mb-6">Creează un cont nou</p>
 
+        {/* Input Email */}
         <input
           type="email"
           placeholder="Email"
@@ -71,14 +73,26 @@ export default function SignupPage() {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Parolă"
-          className="w-full mb-4 px-4 py-2 border-2 border-[#89AC46] rounded-md text-[#353935] bg-white focus:outline-none focus:ring-2 focus:ring-[#D3E671] transition"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
+        {/* Input Parolă cu ochișor */}
+        <div className="relative w-full mb-4">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Parolă"
+            className="w-full px-4 py-2 border-2 border-[#89AC46] rounded-md text-[#353935] bg-white focus:outline-none focus:ring-2 focus:ring-[#D3E671] transition pr-10"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(v => !v)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#353935] bg-transparent border-none cursor-pointer"
+            tabIndex={-1}
+            aria-label={showPassword ? "Ascunde parola" : "Arată parola"}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
 
         {errorMsg && (
           <div className="w-full mb-4 bg-[#D3E671] text-[#353935] text-sm rounded px-3 py-2 text-center">

@@ -4,18 +4,25 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
-export default function SearchInput() {
+interface SearchInputProps {
+  query: string;
+  setQuery: (q: string) => void;
+}
+
+export default function SearchInput({ query, setQuery }: SearchInputProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Inițializează cu valoarea din query string, dacă există
-  const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Dacă vrei să sincronizezi promptul cu URL-ul (opțional)
   useEffect(() => {
     const queryFromUrl = searchParams.get('query') || '';
-    setQuery(queryFromUrl);
+    if (queryFromUrl && queryFromUrl !== query) {
+      setQuery(queryFromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
