@@ -26,6 +26,11 @@ body {
   h1, h2, h3, h4, h5, h6 {
   font-family: 'Pally', Arial, Helvetica, sans-serif;
 }
+pre {
+  font-family: 'Chubbo', Arial, Helvetica, sans-serif !important;
+  font-size: 0.875rem; /* sau ajustează după preferință */
+  white-space: pre-line; /* păstrează formatul, dar nu monospace */
+}
 
   /*font-family: Arial, Helvetica, sans-serif;*/
 }

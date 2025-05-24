@@ -168,12 +168,12 @@ export default function LocationCard(props: LocationCardProps) {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
               </svg>
-              <span>Se generează rezumatul...</span>
+              <span className="text-[#353935]">Se generează rezumatul...</span>
             </div>
           )}
           {reviewSummary && (
             <div className="bg-[#F6F6F6] rounded p-3 mt-2">
-              <h4 className="font-semibold mb-1">Conform opiniilor foștilor clienți:</h4>
+              <h4 className="font-semibold mb-1 text-[#353935]">Conform opiniilor foștilor clienți:</h4>
               <pre className="whitespace-pre-line text-sm text-[#353935]">{reviewSummary}</pre>
             </div>
           )}
