@@ -28,16 +28,36 @@ const FILTERS = [
   { key: "distance", label: "Distanță" },
 ];
 
+// Helper pentru extragerea coordonatelor din orice structură
+function extractLatLng(place: any) {
+  return {
+    lat: place.lat ?? place.latitude ?? place.location?.lat,
+    lng: place.lng ?? place.longitude ?? place.location?.lng,
+  };
+}
+
 export default function ResultsList({ places }: ResultsListProps) {
   const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc" | "distance" | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [sortedPlaces, setSortedPlaces] = useState<LocationCardProps[]>(places);
 
+  // DEBUG: vezi ce coordonate ai și ce date primești
+  useEffect(() => {
+    console.log("DEBUG: Coordonate user:", coords);
+    console.log("DEBUG: Lista locații:", places);
+    if (places.length > 0) {
+      console.log("DEBUG: Exemplu structură locație:", places[0]);
+    }
+  }, [coords, places]);
+
   // Obține coordonatele userului când selectezi "distanță"
   useEffect(() => {
     if (sortBy === "distance" && !coords && typeof window !== "undefined" && "geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        pos => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        pos => {
+          console.log("DEBUG: Coordonate obținute:", pos.coords.latitude, pos.coords.longitude);
+          setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        },
         err => alert("Nu am putut obține locația: " + err.message)
       );
     }
@@ -48,44 +68,106 @@ export default function ResultsList({ places }: ResultsListProps) {
     let newPlaces = [...places];
 
     if (sortBy === "rating") {
-      // Sortează descrescător după rating, ignoră undefined
       newPlaces = newPlaces
         .filter(p => typeof p.rating === "number")
         .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     } else if (sortBy === "price_asc") {
-      // Sortează crescător după price_level, ignoră undefined
       newPlaces = newPlaces
         .filter(p => typeof p.price_level === "number")
         .sort((a, b) => (a.price_level ?? 0) - (b.price_level ?? 0));
     } else if (sortBy === "price_desc") {
-      // Sortează descrescător după price_level, ignoră undefined
       newPlaces = newPlaces
         .filter(p => typeof p.price_level === "number")
         .sort((a, b) => (b.price_level ?? 0) - (a.price_level ?? 0));
     } else if (sortBy === "distance" && coords) {
-      // Calculează distanța, filtrează doar locurile cu coordonate și la max 25 km
-      newPlaces = newPlaces
-        .map(place => {
-          const lat = (place as any).lat ?? (place as any).latitude;
-          const lng = (place as any).lng ?? (place as any).longitude;
-          let distance = Infinity;
-          if (typeof lat === "number" && typeof lng === "number") {
-            distance = getDistanceKm(coords.lat, coords.lng, lat, lng);
-          }
-          return { ...place, _distance: distance };
-        })
-        .filter(place => typeof place._distance === "number" && place._distance <= 25)
-        .sort((a, b) => (a._distance ?? Infinity) - (b._distance ?? Infinity));
-    }
+  // Filtrează locațiile care au coordonate valide
+  const placesWithCoords = newPlaces.filter(place => {
+    const lat =
+      (place as any).lat ??
+      (place as any).latitude ??
+      (place as any).location?.lat;
+    const lng =
+      (place as any).lng ??
+      (place as any).longitude ??
+      (place as any).location?.lng;
+    return typeof lat === "number" && typeof lng === "number";
+  });
+
+  if (placesWithCoords.length === 0) {
+    console.warn("DEBUG: Nicio locație nu are coordonate valide (lat/lng sau latitude/longitude sau location.lat/lng).");
+  }
+
+  newPlaces = placesWithCoords
+    .map(place => {
+      const lat =
+        (place as any).lat ??
+        (place as any).latitude ??
+        (place as any).location?.lat;
+      const lng =
+        (place as any).lng ??
+        (place as any).longitude ??
+        (place as any).location?.lng;
+      let distance = Infinity;
+      if (typeof lat === "number" && typeof lng === "number") {
+        distance = getDistanceKm(coords.lat, coords.lng, lat, lng);
+      }
+      return { ...place, _distance: distance };
+    });
+
+  // DEBUG: vezi ce distanțe s-au calculat pentru fiecare locație
+  console.log("DEBUG: Distanțe calculate pentru fiecare locație:");
+  newPlaces.forEach(p => {
+    console.log({
+      name: p.name,
+      _distance: (p as any)._distance,
+      lat:
+        (p as any).lat ??
+        (p as any).latitude ??
+        (p as any).location?.lat,
+      lng:
+        (p as any).lng ??
+        (p as any).longitude ??
+        (p as any).location?.lng
+    });
+  });
+
+  newPlaces = newPlaces
+    .filter(place => typeof (place as any)._distance === "number" && (place as any)._distance <= 30)
+    .sort((a, b) => ((a as any)._distance ?? Infinity) - ((b as any)._distance ?? Infinity));
+}
+
 
     setSortedPlaces(newPlaces);
   }, [sortBy, coords, places]);
+
+  // Mesaj dacă nu există locuri cu coordonate valide
+  if (
+    sortBy === "distance" &&
+    coords &&
+    places.length > 0 &&
+    places.every(
+      place => {
+        const { lat, lng } = extractLatLng(place);
+        return typeof lat !== "number" || typeof lng !== "number";
+      }
+    )
+  ) {
+    return (
+      <p className="text-[#353935] text-center mt-8">
+        Nicio locație nu are coordonate valide (lat/lng, latitude/longitude sau location.lat/lng).
+        <br />
+        <span style={{ fontSize: 14, color: "#FF8787" }}>
+          (Verifică structura obiectelor locație în consola browserului!)
+        </span>
+      </p>
+    );
+  }
 
   // Mesaj dacă nu există locuri în apropiere la filtrarea pe distanță
   if (sortBy === "distance" && coords && !sortedPlaces.length) {
     return (
       <p className="text-[#353935] text-center mt-8">
-        Nu am găsit rezultate în apropierea ta (maxim 25 km).
+        Nu am găsit rezultate în apropierea ta (maxim 30 km).
       </p>
     );
   }

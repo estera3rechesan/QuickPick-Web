@@ -4,6 +4,7 @@ import SearchInput from '@/components/SearchInput';
 import MoodSearch from '@/components/MoodSearch';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import ContextualSuggestionButton from '@/components/ContextualSuggestionButton';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -67,8 +68,11 @@ export default function Home() {
         loading={loading}
       />
 
+      {/* Buton contextual cu spațiu generos */}
+      <ContextualSuggestionButton />
+
       {/* Mood search sub search bar */}
-      <div className="mt-10 w-full flex justify-center">
+      <div className="w-full flex justify-center">
         <MoodSearch onMoodSelect={handleMoodPrompt} />
       </div>
     </main>

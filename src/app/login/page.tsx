@@ -77,7 +77,7 @@ export default function LoginPage() {
 
         {/* Titlu și subtitlu */}
         <h1 className="text-3xl font-bold text-[#353935] mb-1">QuickPick</h1>
-        <p className="text-base text-[#353935] mb-6">Explore & Choose</p>
+        <p className="text-base text-[#353935] mb-6">Scrii ce vrei. Găsești ce-ți trebuie.</p>
 
         {/* Input Email */}
         <input
