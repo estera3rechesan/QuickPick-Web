@@ -101,19 +101,8 @@ export default function LocationCard(props: LocationCardProps) {
       </div>
 
       <div className="flex-1">
-        {/* Nume cu link */}
-        {isValidUrl(website) ? (
-          <a
-            href={website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xl font-bold text-[#353935] hover:text-[#FF8787] transition"
-          >
-            {name}
-          </a>
-        ) : (
-          <h3 className="text-xl font-bold text-[#353935]">{name}</h3>
-        )}
+        {/* Titlu simplu, mereu heading, fără link */}
+        <h3 className="text-xl font-bold text-[#353935]">{name}</h3>
 
         <p className="text-[#353935] text-sm mb-2">{address}</p>
 
