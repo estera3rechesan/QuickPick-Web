@@ -1,52 +1,101 @@
-"use client";
-import Image from 'next/image';
-import SearchInput from '@/components/SearchInput';
-import MoodSearch from '@/components/MoodSearch';
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import ContextualSuggestionButton from '@/components/ContextualSuggestionButton';
+/**
+ * page.tsx - Pagina principala (home) pentru QuickPick
+ * 
+ * Acest component afiseaza landing page-ul aplicatiei, unde utilizatorul poate incepe rapid cautarea de locuri si activitati.
+ * Functii principale:
+ *  - Afiseaza logo-ul, titlul si sloganul aplicatiei.
+ *  - Ofera doua moduri principale de cautare: search bar clasic si mood search (cautare pe baza starii de spirit).
+ *  - Permite cautari contextuale rapide prin ContextualSuggestionButton.
+ *  - Detecteaza automat query-ul din URL (ex: cand utilizatorul vine din istoric) si redirectioneaza catre pagina de rezultate.
+ *  - Gestioneaza refresh-ul automat dupa login pentru a reincarca datele utilizatorului.
+ * Elemente cheie:
+ *  - Integrare cu router-ul Next.js pentru navigare programatica.
+ *  - Folosire useState si useEffect pentru gestionarea starii si efectelor secundare.
+ *  - Componente custom pentru input, mood search si sugestii contextuale.
+ *  - UI modern, centrat, cu branding vizibil si interactiune rapida.
+ */
+
+"use client"; // Activeaza functionalitatea client-side in Next.js
+
+import Image from 'next/image'; // Component pentru afisarea imaginilor optimizate
+import SearchInput from '@/components/SearchInput'; // Component custom pentru search bar
+import MoodSearch from '@/components/MoodSearch'; // Component custom pentru mood search
+import { useState, useEffect } from 'react'; // Hook-uri pentru stare si efecte
+import { useRouter, useSearchParams } from 'next/navigation'; // Hook-uri pentru navigare si parametri URL
+import ContextualSuggestionButton from '@/components/ContextualSuggestionButton'; // Component pentru sugestii contextuale
 
 export default function Home() {
-  const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(''); // Stare pentru textul cautat
+  const [loading, setLoading] = useState(false); // Stare pentru loading la cautare
+  const router = useRouter(); // Hook pentru navigare programatica
+  const searchParams = useSearchParams(); // Hook pentru citirea parametrilor din URL
 
-  // Pentru refresh după login
+  // Efect pentru refresh dupa login (cand URL-ul contine ?refresh=1)
   useEffect(() => {
     if (searchParams.get("refresh") === "1") {
-      window.history.replaceState({}, document.title, "/");
-      window.location.reload();
+      window.history.replaceState({}, document.title, "/"); // Curata URL-ul
+      window.location.reload(); // Reincarca pagina complet
     }
   }, [searchParams]);
 
-  // Detectează query în URL (ex: când vii din istoric) și pornește căutarea automat
+  // Efect pentru detectarea query-ului in URL si pornirea cautarii automat
   useEffect(() => {
     const urlQuery = searchParams.get("query");
     if (urlQuery && urlQuery !== query) {
-      setQuery(urlQuery);
-      setLoading(true);
-      router.push(`/results?query=${encodeURIComponent(urlQuery)}`);
+      setQuery(urlQuery); // Seteaza query-ul din URL in state
+      setLoading(true); // Porneste loading-ul
+      router.push(`/results?query=${encodeURIComponent(urlQuery)}`); // Navigheaza la pagina de rezultate
     }
     // eslint-disable-next-line
   }, [searchParams]);
 
-  // Pentru căutarea din search bar
-  const handleSearch = () => {
+  // Functie pentru cautarea din search bar (fetch catre API-ul tau)
+  /*const handleSearch = () => {
+    setLoading(true); // Porneste loading-ul
+    router.push(`/results?query=${encodeURIComponent(query)}`); // Navigheaza la pagina de rezultate cu query
+  };*/
+  const handleSearch = async () => {
     setLoading(true);
-    router.push(`/results?query=${encodeURIComponent(query)}`);
+    try {
+      const response = await fetch('/api/searchPlaces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: query }),
+      });
+      const data = await response.json();
+      // Poti folosi data.places aici daca vrei sa afisezi direct rezultatele in Home
+      // Dar in fluxul tau actual, redirectionezi catre pagina de rezultate
+      router.push(`/results?query=${encodeURIComponent(query)}`);
+    } catch (error) {
+      // Poti afisa o eroare in UI daca vrei
+      console.error("Eroare la cautare:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Pentru mood search
-  const handleMoodPrompt = (prompt: string) => {
+  // Functie pentru mood search (cautare pe baza starii de spirit)
+  const handleMoodPrompt = async (prompt: string) => {
     setQuery(prompt);
     setLoading(true);
-    router.push(`/results?query=${encodeURIComponent(prompt)}`);
+    try {
+      const response = await fetch('/api/searchPlaces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await response.json();
+      router.push(`/results?query=${encodeURIComponent(prompt)}`);
+    } catch (error) {
+      console.error("Eroare la cautare mood:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <main className="pt-24 flex flex-col items-center justify-center min-h-screen bg-[#FFECEC] p-4">
-      {/* Logo și titlu */}
+      {/* Logo si titlu */}
       <div className="flex flex-col items-center mb-8">
         <Image
           src="/LogoQP_roz.png"
@@ -57,10 +106,10 @@ export default function Home() {
           priority
         />
         <h1 className="text-4xl font-bold text-[#353935] mb-1">QuickPick</h1>
-        <p className="text-lg text-[#353935]">Scrii ce vrei. Găsești ce-ți trebuie.</p>
+        <p className="text-lg text-[#353935]">Scrii ce vrei. Gasesti ce-ti trebuie.</p>
       </div>
 
-      {/* Search Bar */}
+      {/* Search Bar principal */}
       <SearchInput
         query={query}
         setQuery={setQuery}
@@ -68,7 +117,7 @@ export default function Home() {
         loading={loading}
       />
 
-      {/* Buton contextual cu spațiu generos */}
+      {/* Buton pentru sugestii contextuale */}
       <ContextualSuggestionButton />
 
       {/* Mood search sub search bar */}

@@ -1,38 +1,65 @@
-import { NextRequest, NextResponse } from "next/server";
-import { parseUserPrompt } from '@/utils/parseUserPrompt'; 
-import { fetchPlacesFromMaps } from "@/utils/fetchPlacesFromMaps";
-import { createClient } from "@/utils/supabase/server";
+/**
+ * route.ts - API pentru cautarea locatiilor pe baza unui prompt inteligent
+ * 
+ * Acest endpoint POST primeste un prompt text de la utilizator si returneaza o lista de locatii relevante.
+ * Functii principale:
+ *  - Preia promptul din body-ul cererii si valideaza existenta acestuia.
+ *  - Daca userul este autentificat, salveaza promptul in istoricul personal (search_history).
+ *  - Proceseaza promptul cu AI (parseUserPrompt) pentru a extrage categoria, specificatii si locatie.
+ *  - Construieste query-ul pentru cautare folosind aceste informatii.
+ *  - Cauta locatii relevante folosind Google Places API (fetchPlacesFromMaps).
+ *  - Returneaza lista de locatii gasite sau mesaj de eroare.
+ * Elemente cheie:
+ *  - Integrare cu Supabase pentru autentificare si stocare istoric cautari.
+ *  - Procesare prompt inteligenta cu AI (NLP).
+ *  - Cautare dinamica pe Google Places pe baza unui query compus.
+ *  - Gestionare robusta a erorilor si raspunsuri clare pentru client.
+ */
+
+import { NextRequest, NextResponse } from "next/server"; // Importa tipurile pentru request si response din Next.js
+import { parseUserPrompt } from '@/utils/parseUserPrompt'; // Importa functia pentru procesarea promptului
+import { fetchPlacesFromMaps } from "@/utils/fetchPlacesFromMaps"; // Importa functia pentru cautarea locatiilor pe Google Places
+import { createClient } from "@/utils/supabase/server"; // Importa functia pentru initializarea clientului Supabase
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt } = await req.json();
+    const { prompt } = await req.json(); // Extrage promptul din body-ul cererii
+    // Verifica daca promptul exista
     if (!prompt) return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
 
-    // Creează clientul Supabase și ia userul
+    // Creeaza clientul Supabase si ia userul curent
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Salvează în istoric dacă userul e logat
+    // AICI adaugi logurile de debug:
+    console.log("user:", user);
+    console.log("user.id:", user?.id);
+
+    // Daca userul este logat si exista prompt, salveaza cautarea in istoric
     if (user && prompt) {
-      await supabase.from("search_history").insert([
-        { user_id: user.id, query: prompt }
-      ]);
+     const { data, error } = await supabase
+    .from("search_history")
+    .insert([{ user_id: user.id, query: prompt }]);
+    if (error) {
+    console.error("Eroare la insert search_history:", error);
+  }
     }
 
-    // 1. Procesează promptul cu AI
+    // Proceseaza promptul cu AI pentru a extrage categoria, specificatii si locatie
     const { category, specifications, location } = await parseUserPrompt(prompt);
 
-    // 2. Construiește query-ul pentru Google Places
+    // Construieste query-ul pentru cautare pe Google Places
     let query = category;
-    if (specifications) query += ` ${specifications}`;
-    if (location) query += ` ${location}`;
+    if (specifications) query += ` ${specifications}`; // Adauga specificatii daca exista
+    if (location) query += ` ${location}`; // Adauga locatie daca exista
 
-    // 4. Caută pe Google Places
+    // Cauta locatii relevante folosind Google Places API
     const places = await fetchPlacesFromMaps({ query });
 
-    // 5. Returnează rezultatele
+    // Returneaza lista de locatii gasite
     return NextResponse.json({ places });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Eroare internă" }, { status: 500 });
+    // In caz de eroare, returneaza mesaj de eroare si status 500
+    return NextResponse.json({ error: err.message || "Eroare interna" }, { status: 500 });
   }
 }

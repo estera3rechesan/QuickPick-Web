@@ -1,4 +1,18 @@
-"use client";
+/**
+ * MoodSearch.tsx - Component pentru cautare pe baza starii de spirit (mood search) in QuickPick
+ * 
+ * Acest component afiseaza o selectie de butoane cu diverse "mood-uri" (stari de spirit) pentru a ajuta utilizatorul sa gaseasca rapid locuri sau activitati potrivite.
+ * Functii principale:
+ *  - Afiseaza o lista de optiuni (mood-uri), fiecare cu icon, descriere si prompt predefinit.
+ *  - La click pe un mood, trimite promptul asociat catre functia onMoodSelect (callback) pentru a porni cautarea.
+ * Elemente cheie:
+ *  - Lista de mood-uri cu iconite vizuale si descrieri sugestive (ex: Familie, Romantic, Sport, Buget redus, etc).
+ *  - Design responsive, modern, cu feedback vizual la hover.
+ *  - Integrare usoara cu fluxul principal de cautare din aplicatie.
+ */
+
+"use client"; // Activeaza functionalitatea client-side in Next.js
+
 import {
   FaBook,
   FaHeart,
@@ -12,109 +26,113 @@ import {
   FaPalette,
   FaGlassCheers,
   FaMoneyBillWave,
-} from "react-icons/fa";
-import { MdFamilyRestroom } from "react-icons/md";
+} from "react-icons/fa"; // Importa iconite pentru fiecare mood
+import { MdFamilyRestroom } from "react-icons/md"; // Iconita pentru familie
 
+// Tipul props pentru componenta MoodSearch
 interface MoodSearchProps {
-  onMoodSelect: (prompt: string) => void;
+  onMoodSelect: (prompt: string) => void; // Callback la selectarea unui mood
 }
 
-const iconClass = "text-3xl text-[#93c572]"; // Toate iconițele verzi și puțin mai mari
+// Clasa CSS pentru iconite (culoare verde, marime mare)
+const iconClass = "text-3xl text-[#93c572]";
 
+// Lista de mood-uri cu label, prompt, icon si descriere
 const moods = [
   {
     label: "Familie & Copii",
     prompt:
-      "Recomandă locuri de petrecut timpul cu familia, potrivite pentru copii, cum ar fi parcuri, locuri de joaca, restaurante cu spatiu pentru copii.",
+      "Recomanda locuri de petrecut timpul cu familia, potrivite pentru copii, cum ar fi parcuri, locuri de joaca, restaurante cu spatiu pentru copii.",
     icon: <MdFamilyRestroom className={iconClass} />,
-    description: "Locuri distractive pentru copii și părinți.",
+    description: "Locuri distractive pentru copii si parinti.",
   },
   {
     label: "Romantic",
     prompt:
-      "Recomandă locuri romantice pentru cupluri, cu atmosferă plăcută și liniștită, cum ar fi restaurante elegante, muzeuri, parcuri frumoase, sau locuri cu priveliști spectaculoase.",
+      "Recomanda locuri romantice pentru cupluri, cu atmosfera placuta si linistita, cum ar fi restaurante elegante, muzee, parcuri frumoase, sau locuri cu privelisti spectaculoase.",
     icon: <FaHeart className={iconClass} />,
-    description: "Pentru cupluri, atmosferă intimă.",
+    description: "Pentru cupluri, atmosfera intima.",
   },
   {
     label: "Prieteni & Socializare",
     prompt:
-      "Recomandă locuri potrivite pentru socializare cu prietenii, cu atmosferă relaxată și prietenoasă, cum ar fi cafenele, bistrouri, fast-food-uri, baruri, locuri cu jocuri de societate, sau locuri cu activități interactive.",
+      "Recomanda locuri potrivite pentru socializare cu prietenii, cu atmosfera relaxata si prietenoasa, cum ar fi cafenele, bistrouri, fast-food-uri, baruri, locuri cu jocuri de societate, sau locuri cu activitati interactive.",
     icon: <FaUsers className={iconClass} />,
-    description: "Pentru grupuri, atmosferă relaxată.",
+    description: "Pentru grupuri, atmosfera relaxata.",
   },
   {
-    label: "Mâncare & Restaurante",
+    label: "Mancare & Restaurante",
     prompt:
-      "Recomandă restaurante sau localuri cu mâncare bună, potrivite pentru o ieșire relaxată la masă.",
+      "Recomanda restaurante sau localuri cu mancare buna, potrivite pentru o iesire relaxata la masa.",
     icon: <FaUtensils className={iconClass} />,
     description: "Restaurante, terase, bistro-uri.",
   },
   {
     label: "Vegan/Vegetarian",
     prompt:
-      "Recomandă restaurante cu opțiuni vegane sau vegetariene, evită fast-food-uri clasice.",
+      "Recomanda restaurante cu optiuni vegane sau vegetariene, evita fast-food-uri clasice.",
     icon: <FaLeaf className={iconClass} />,
     description: "Meniu vegan sau vegetarian.",
   },
   {
-    label: "Natură & Plimbare",
+    label: "Natura & Plimbare",
     prompt:
-      "Recomandă locuri în aer liber, parcuri sau grădini pentru plimbare și relaxare în natură.",
+      "Recomanda locuri in aer liber, parcuri sau gradini pentru plimbare si relaxare in natura.",
     icon: <FaTree className={iconClass} />,
-    description: "Parcuri, grădini, natură.",
+    description: "Parcuri, gradini, natura.",
   },
   {
     label: "Pet Friendly",
     prompt:
-      "Recomandă locuri unde animalele de companie sunt binevenite, cum ar fi restaurante sau cafenele.",
+      "Recomanda locuri unde animalele de companie sunt binevenite, cum ar fi restaurante sau cafenele.",
     icon: <FaPaw className={iconClass} />,
-    description: "Locuri unde poți merge cu animalele de companie.",
+    description: "Locuri unde poti merge cu animalele de companie.",
   },
   {
     label: "Cafenea & Relaxare",
     prompt:
-      "Recomandă cafenele sau ceainării cu atmosferă relaxantă, cum ar fi cafenele de specialitate și ceainării.",
+      "Recomanda cafenele sau ceainarii cu atmosfera relaxanta, cum ar fi cafenele de specialitate si ceainarii.",
     icon: <FaCoffee className={iconClass} />,
-    description: "Cafenele, ceainării, locuri liniștite.",
+    description: "Cafenele, ceainarii, locuri linistite.",
   },
   {
     label: "Citit",
     prompt:
-      "Recomandă un loc liniștit și confortabil pentru citit, cum ar fi cafenele, ceainării, biblioteci, librării.",
+      "Recomanda un loc linistit si confortabil pentru citit, cum ar fi cafenele, ceainarii, biblioteci, librarii.",
     icon: <FaBook className={iconClass} />,
-    description: "Locuri liniștite pentru citit.",
+    description: "Locuri linistite pentru citit.",
   },
   {
-    label: "Sport & Activități",
+    label: "Sport & Activitati",
     prompt:
-      "Recomandă locuri pentru activități sportive sau de fitness, evită spitale sau clinici.",
+      "Recomanda locuri pentru activitati sportive sau de fitness, evita spitale sau clinici.",
     icon: <FaDumbbell className={iconClass} />,
-    description: "Săli de sport, activități fizice.",
+    description: "Sali de sport, activitati fizice.",
   },
   {
-    label: "Cultural & Artă",
+    label: "Cultural & Arta",
     prompt:
-      "Recomandă locuri culturale, muzee, galerii de artă sau expoziții interesante.",
+      "Recomanda locuri culturale, muzee, galerii de arta sau expozitii interesante.",
     icon: <FaPalette className={iconClass} />,
-    description: "Muzee, galerii, expoziții.",
+    description: "Muzee, galerii, expozitii.",
   },
   {
-    label: "Noapte & Distracție",
+    label: "Noapte & Distractie",
     prompt:
-      "Recomandă baruri, cluburi sau locuri pentru distracție de noapte.",
+      "Recomanda baruri, cluburi sau locuri pentru distractie de noapte.",
     icon: <FaGlassCheers className={iconClass} />,
-    description: "Baruri, cluburi, viață de noapte.",
+    description: "Baruri, cluburi, viata de noapte.",
   },
   {
     label: "Buget redus",
     prompt:
-      "Recomandă locuri bune cu prețuri accesibile, potrivite pentru un buget redus, cum ar fi fast-food-uri, restaurante ieftine, muzee gratuite, parcuri.",
+      "Recomanda locuri bune cu preturi accesibile, potrivite pentru un buget redus, cum ar fi fast-food-uri, restaurante ieftine, muzee gratuite, parcuri.",
     icon: <FaMoneyBillWave className={iconClass} />,
-    description: "Opțiuni accesibile, prețuri mici.",
+    description: "Optiuni accesibile, preturi mici.",
   },
 ];
 
+// Componenta MoodSearch
 export default function MoodSearch({ onMoodSelect }: MoodSearchProps) {
   return (
     <div className="w-full max-w-4xl mx-auto mt-10 text-center">
@@ -124,7 +142,7 @@ export default function MoodSearch({ onMoodSelect }: MoodSearchProps) {
           <button
             key={mood.label}
             className="flex flex-col items-center bg-white rounded-xl shadow px-5 py-4 hover:bg-[#c9e2b8] transition w-40 h-36 justify-center"
-            onClick={() => onMoodSelect(mood.prompt)}
+            onClick={() => onMoodSelect(mood.prompt)} // La click trimite promptul catre callback
             type="button"
             title={mood.description}
           >
