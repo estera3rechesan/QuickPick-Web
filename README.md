@@ -5,6 +5,7 @@
 1. **Clonarea repository-ului**
 
 git clone https://github.com/estera3rechesan/QuickPick-Web.git
+
 cd QuickPick-Web
 
 2. **Instalarea dependențelor**
