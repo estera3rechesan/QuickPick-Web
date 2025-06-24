@@ -1,31 +1,17 @@
-/**
- * Navbar.tsx - Bara de navigatie principala pentru QuickPick
- * 
- * Acest component afiseaza bara de navigatie fixa in partea de sus a aplicatiei.
- * Functii principale:
- *  - Afiseaza logo-ul QuickPick cu link catre homepage.
- *  - Afiseaza avatarul si emailul utilizatorului daca este autentificat.
- *  - Daca utilizatorul nu este logat, afiseaza butonul de login.
- * Elemente cheie:
- *  - Integrare cu Supabase pentru a detecta userul autentificat.
- *  - UI minimalist, responsive, cu shadow si pozitionare fixa.
- *  - Iconita user (FaUserCircle) si logo vizibil pe toate paginile.
- */
+"use client";
 
-"use client"; // Activeaza functionalitatea client-side in Next.js
-
-import Link from "next/link"; // Link pentru navigare intre pagini Next.js
-import { useEffect, useState } from "react"; // Hook-uri pentru stare si efecte
-import { createClient } from "@/utils/supabase/client"; // Functie pentru initializarea clientului Supabase
-import { FaUserCircle } from "react-icons/fa"; // Iconita user
-import Image from "next/image"; // Component pentru afisarea logo-ului
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { FaUserCircle } from "react-icons/fa";
+import Image from "next/image";
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null); // Stare pentru userul autentificat
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const supabase = createClient(); // Creeaza clientul Supabase
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user)); // Ia userul curent si seteaza in state
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
   }, []);
 
   return (
@@ -49,7 +35,6 @@ export default function Navbar() {
             <span className="text-[#353935] text-sm">{user.email}</span>
           </Link>
         ) : (
-          // Daca nu este logat, afiseaza butonul de login
           <Link href="/login" className="flex items-center gap-2">
             <FaUserCircle size={24} className="text-[#ccc]" />
             <span className="text-[#353935] text-sm">Conecteaza-te</span>

@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QuickPick – Ghid de instalare și utilizare
 
-## Getting Started
+## Instalare
 
-First, run the development server:
+1. **Clonarea repository-ului**
 
-```bash
+git clone https://github.com/estera3rechesan/QuickPick-Web.git
+cd QuickPick-Web
+
+2. **Instalarea dependențelor**
+
+npm install
+
+
+3. **Pornirea aplicației local**
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. **Accesarea aplicației**
+Se accesează aplicația la adresa: [http://localhost:3000](http://localhost:3000)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Utilizare
 
-## Learn More
+- **Fără autentificare:**  
+Se pot efectua căutări de locații și vizualiza rezultatele în pagina dedicată.
 
-To learn more about Next.js, take a look at the following resources:
+- **Autentificare:**  
+Se poate crea un cont nou (este necesară confirmarea acestuia prin e-mail).
+Alternativ, aplicația poate fi accesată cu următorul cont de test:
+ - **Email:** 2004.esty@gmail.com
+ - **Parolă:** parola_test
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Cu autentificare:**  
+Se pot salva locații la favorite, vizualiza istoricul căutărilor și accesa setările de profil.

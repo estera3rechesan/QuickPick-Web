@@ -1,68 +1,52 @@
-/**
- * page.tsx - Pagina de inregistrare (signup) pentru QuickPick
- * 
- * Acest component afiseaza formularul pentru crearea unui cont nou in platforma QuickPick.
- * Functii principale:
- *  - Permite crearea unui cont nou cu email si parola folosind Supabase.
- *  - Afiseaza si gestioneaza starea pentru inputuri, erori, loading, succes.
- *  - Ofera optiune de afisare/ascundere parola cu iconita.
- *  - Afiseaza logo-ul si link catre pagina de login.
- * Elemente cheie:
- *  - Integrare cu Supabase pentru signup.
- *  - UI modern cu Tailwind CSS, iconite pentru vizibilitate parola.
- *  - Gestionare stari pentru inputuri, erori, succes, loading.
- *  - Redirect automat catre login dupa creare cont cu succes.
- */
+'use client';
 
-'use client'; // Activeaza functionalitatea client-side in Next.js
-
-import { useState } from 'react'; // Hook pentru gestionarea starii locale
-import Image from 'next/image'; // Component pentru afisarea imaginilor optimizate
-import { useRouter } from 'next/navigation'; // Hook pentru navigare programatica
-import { createClient } from '@/utils/supabase/client'; // Functie pentru initializarea clientului Supabase
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Iconite pentru afisarea/ascunderea parolei
+import { useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function SignupPage() {
-  const [email, setEmail] = useState(''); // Stare pentru email
-  const [password, setPassword] = useState(''); // Stare pentru parola
-  const [showPassword, setShowPassword] = useState(false); // Stare pentru afisarea/ascunderea parolei
-  const [errorMsg, setErrorMsg] = useState(''); // Stare pentru mesaj de eroare
-  const [loading, setLoading] = useState(false); // Stare pentru loading la signup
-  const [successMsg, setSuccessMsg] = useState(''); // Stare pentru mesaj de succes
-  const router = useRouter(); // Hook pentru navigare
-  const supabase = createClient(); // Creeaza clientul Supabase
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const router = useRouter();
+  const supabase = createClient();
 
-  // Functie pentru signup (creare cont nou)
+  // Functie pentru crearea unui cont nou
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault(); // Previne submit-ul default al formularului
-    setErrorMsg(''); // Reseteaza mesajul de eroare
-    setSuccessMsg(''); // Reseteaza mesajul de succes
-    setLoading(true); // Porneste loading-ul
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+    setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
       password,
-    }); // Incearca inregistrarea cu email si parola
-    setLoading(false); // Opreste loading-ul
+    });
+    setLoading(false);
     if (error) {
-      setErrorMsg(error.message); // Afiseaza mesajul de eroare daca exista
+      setErrorMsg(error.message);
     } else {
-      setSuccessMsg('Cont creat! Verifica emailul pentru confirmare.'); // Mesaj de succes
-      setTimeout(() => router.push('/login'), 2000); // Dupa 2 secunde redirect la login
+      setSuccessMsg('Cont creat! Verifica emailul pentru confirmare.');
+      setTimeout(() => router.push('/login'), 2000);
     }
   };
 
-  // Functie pentru refresh la click pe logo (opțional)
+  // Functie pentru refresh la click pe logo
   const handleLogoClick = () => {
-    setEmail(''); // Reseteaza emailul
-    setPassword(''); // Reseteaza parola
-    setErrorMsg(''); // Reseteaza mesajul de eroare
-    setSuccessMsg(''); // Reseteaza mesajul de succes
+    setEmail('');
+    setPassword('');
+    setErrorMsg('');
+    setSuccessMsg('');
   };
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#FFECEC] p-4">
       <form
-        onSubmit={handleSignup} // La submit se apeleaza signup
+        onSubmit={handleSignup}
         className="w-full max-w-sm bg-white/70 rounded-xl shadow-md px-8 pt-8 pb-6 flex flex-col items-center"
       >
         {/* Logo */}
@@ -80,29 +64,29 @@ export default function SignupPage() {
         <h1 className="text-3xl font-bold text-[#353935] mb-1">QuickPick</h1>
         <p className="text-base text-[#353935] mb-6">Creeaza un cont nou</p>
 
-        {/* Input Email */}
+        {/* Caseta de text Email */}
         <input
           type="email"
           placeholder="Email"
           className="w-full mb-4 px-4 py-2 border-2 border-[#89AC46] rounded-md text-[#353935] bg-white focus:outline-none focus:ring-2 focus:ring-[#D3E671] transition"
           value={email}
-          onChange={e => setEmail(e.target.value)} // Actualizeaza emailul la schimbare
+          onChange={e => setEmail(e.target.value)}
           required
         />
 
-        {/* Input Parola cu ochisor */}
+        {/* Caseta de text Parola*/}
         <div className="relative w-full mb-4">
           <input
-            type={showPassword ? "text" : "password"} // Afiseaza sau ascunde parola
+            type={showPassword ? "text" : "password"}
             placeholder="Parola"
             className="w-full px-4 py-2 border-2 border-[#89AC46] rounded-md text-[#353935] bg-white focus:outline-none focus:ring-2 focus:ring-[#D3E671] transition pr-10"
             value={password}
-            onChange={e => setPassword(e.target.value)} // Actualizeaza parola la schimbare
+            onChange={e => setPassword(e.target.value)}
             required
           />
           <button
             type="button"
-            onClick={() => setShowPassword(v => !v)} // Toggle vizibilitate parola
+            onClick={() => setShowPassword(v => !v)}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-[#353935] bg-transparent border-none cursor-pointer"
             tabIndex={-1}
             aria-label={showPassword ? "Ascunde parola" : "Arata parola"}
@@ -111,13 +95,13 @@ export default function SignupPage() {
           </button>
         </div>
 
-        {/* Afisare mesaj de eroare daca exista */}
+       
         {errorMsg && (
           <div className="w-full mb-4 bg-[#D3E671] text-[#353935] text-sm rounded px-3 py-2 text-center">
             {errorMsg}
           </div>
         )}
-        {/* Afisare mesaj de succes daca exista */}
+       
         {successMsg && (
           <div className="w-full mb-4 bg-[#89AC46] text-white text-sm rounded px-3 py-2 text-center">
             {successMsg}

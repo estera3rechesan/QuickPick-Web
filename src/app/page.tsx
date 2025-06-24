@@ -1,59 +1,37 @@
-/**
- * page.tsx - Pagina principala (home) pentru QuickPick
- * 
- * Acest component afiseaza landing page-ul aplicatiei, unde utilizatorul poate incepe rapid cautarea de locuri si activitati.
- * Functii principale:
- *  - Afiseaza logo-ul, titlul si sloganul aplicatiei.
- *  - Ofera doua moduri principale de cautare: search bar clasic si mood search (cautare pe baza starii de spirit).
- *  - Permite cautari contextuale rapide prin ContextualSuggestionButton.
- *  - Detecteaza automat query-ul din URL (ex: cand utilizatorul vine din istoric) si redirectioneaza catre pagina de rezultate.
- *  - Gestioneaza refresh-ul automat dupa login pentru a reincarca datele utilizatorului.
- * Elemente cheie:
- *  - Integrare cu router-ul Next.js pentru navigare programatica.
- *  - Folosire useState si useEffect pentru gestionarea starii si efectelor secundare.
- *  - Componente custom pentru input, mood search si sugestii contextuale.
- *  - UI modern, centrat, cu branding vizibil si interactiune rapida.
- */
+"use client";
 
-"use client"; // Activeaza functionalitatea client-side in Next.js
-
-import Image from 'next/image'; // Component pentru afisarea imaginilor optimizate
-import SearchInput from '@/components/SearchInput'; // Component custom pentru search bar
-import MoodSearch from '@/components/MoodSearch'; // Component custom pentru mood search
-import { useState, useEffect } from 'react'; // Hook-uri pentru stare si efecte
-import { useRouter, useSearchParams } from 'next/navigation'; // Hook-uri pentru navigare si parametri URL
-import ContextualSuggestionButton from '@/components/ContextualSuggestionButton'; // Component pentru sugestii contextuale
+import Image from 'next/image';
+import SearchInput from '@/components/SearchInput';
+import MoodSearch from '@/components/MoodSearch';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import ContextualSuggestionButton from '@/components/ContextualSuggestionButton';
 
 export default function Home() {
-  const [query, setQuery] = useState(''); // Stare pentru textul cautat
-  const [loading, setLoading] = useState(false); // Stare pentru loading la cautare
-  const router = useRouter(); // Hook pentru navigare programatica
-  const searchParams = useSearchParams(); // Hook pentru citirea parametrilor din URL
+  const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Efect pentru refresh dupa login (cand URL-ul contine ?refresh=1)
+  //Refresh automat dupa login
   useEffect(() => {
     if (searchParams.get("refresh") === "1") {
-      window.history.replaceState({}, document.title, "/"); // Curata URL-ul
-      window.location.reload(); // Reincarca pagina complet
+      window.history.replaceState({}, document.title, "/");
+      window.location.reload();
     }
   }, [searchParams]);
 
-  // Efect pentru detectarea query-ului in URL si pornirea cautarii automat
+  //Detectarea query-ului si pornirea cautarii automat
   useEffect(() => {
     const urlQuery = searchParams.get("query");
     if (urlQuery && urlQuery !== query) {
-      setQuery(urlQuery); // Seteaza query-ul din URL in state
-      setLoading(true); // Porneste loading-ul
-      router.push(`/results?query=${encodeURIComponent(urlQuery)}`); // Navigheaza la pagina de rezultate
+      setQuery(urlQuery);
+      setLoading(true);
+      router.push(`/results?query=${encodeURIComponent(urlQuery)}`);
     }
-    // eslint-disable-next-line
   }, [searchParams]);
 
-  // Functie pentru cautarea din search bar (fetch catre API-ul tau)
-  /*const handleSearch = () => {
-    setLoading(true); // Porneste loading-ul
-    router.push(`/results?query=${encodeURIComponent(query)}`); // Navigheaza la pagina de rezultate cu query
-  };*/
+  // Functie pentru cautareAa din search bar
   const handleSearch = async () => {
     setLoading(true);
     try {
@@ -63,18 +41,15 @@ export default function Home() {
         body: JSON.stringify({ prompt: query }),
       });
       const data = await response.json();
-      // Poti folosi data.places aici daca vrei sa afisezi direct rezultatele in Home
-      // Dar in fluxul tau actual, redirectionezi catre pagina de rezultate
       router.push(`/results?query=${encodeURIComponent(query)}`);
     } catch (error) {
-      // Poti afisa o eroare in UI daca vrei
       console.error("Eroare la cautare:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Functie pentru mood search (cautare pe baza starii de spirit)
+  // Functie pentru mood search
   const handleMoodPrompt = async (prompt: string) => {
     setQuery(prompt);
     setLoading(true);

@@ -1,17 +1,4 @@
-/**
- * MoodSearch.tsx - Component pentru cautare pe baza starii de spirit (mood search) in QuickPick
- * 
- * Acest component afiseaza o selectie de butoane cu diverse "mood-uri" (stari de spirit) pentru a ajuta utilizatorul sa gaseasca rapid locuri sau activitati potrivite.
- * Functii principale:
- *  - Afiseaza o lista de optiuni (mood-uri), fiecare cu icon, descriere si prompt predefinit.
- *  - La click pe un mood, trimite promptul asociat catre functia onMoodSelect (callback) pentru a porni cautarea.
- * Elemente cheie:
- *  - Lista de mood-uri cu iconite vizuale si descrieri sugestive (ex: Familie, Romantic, Sport, Buget redus, etc).
- *  - Design responsive, modern, cu feedback vizual la hover.
- *  - Integrare usoara cu fluxul principal de cautare din aplicatie.
- */
-
-"use client"; // Activeaza functionalitatea client-side in Next.js
+"use client";
 
 import {
   FaBook,
@@ -26,15 +13,13 @@ import {
   FaPalette,
   FaGlassCheers,
   FaMoneyBillWave,
-} from "react-icons/fa"; // Importa iconite pentru fiecare mood
-import { MdFamilyRestroom } from "react-icons/md"; // Iconita pentru familie
+} from "react-icons/fa";
+import { MdFamilyRestroom } from "react-icons/md";
 
-// Tipul props pentru componenta MoodSearch
 interface MoodSearchProps {
-  onMoodSelect: (prompt: string) => void; // Callback la selectarea unui mood
+  onMoodSelect: (prompt: string) => void;
 }
 
-// Clasa CSS pentru iconite (culoare verde, marime mare)
 const iconClass = "text-3xl text-[#93c572]";
 
 // Lista de mood-uri cu label, prompt, icon si descriere
@@ -44,7 +29,7 @@ const moods = [
     prompt:
       "Recomanda locuri de petrecut timpul cu familia, potrivite pentru copii, cum ar fi parcuri, locuri de joaca, restaurante cu spatiu pentru copii.",
     icon: <MdFamilyRestroom className={iconClass} />,
-    description: "Locuri distractive pentru copii si parinti.",
+    description: "Locații pentru copii si parinti.",
   },
   {
     label: "Romantic",
@@ -142,7 +127,7 @@ export default function MoodSearch({ onMoodSelect }: MoodSearchProps) {
           <button
             key={mood.label}
             className="flex flex-col items-center bg-white rounded-xl shadow px-5 py-4 hover:bg-[#c9e2b8] transition w-40 h-36 justify-center"
-            onClick={() => onMoodSelect(mood.prompt)} // La click trimite promptul catre callback
+            onClick={() => onMoodSelect(mood.prompt)}
             type="button"
             title={mood.description}
           >
