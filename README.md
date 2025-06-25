@@ -1,39 +1,21 @@
-# QuickPick – Ghid de instalare și utilizare
+QuickPick
 
-## Instalare
+Repository GitHub: https://github.com/estera3rechesan/QuickPick-Web.git
 
-1. **Clonarea repository-ului**
+- Instalare
 
-git clone https://github.com/estera3rechesan/QuickPick-Web.git
+Pasul 1: Se clonează repository-ul pe PC cu comanda
+git clone ...
 
+Pasul 2: Se intră în directorul în care se află aplicația:
 cd QuickPick-Web
 
-2. **Instalarea dependențelor**
+Pasul 3: Se crează un fișier numit .env.local unde trebuie introduse cheile API, ce trebuie generate.
 
+Pasul 4: Se instalează dependențele cu comanda:
 npm install
 
-
-3. **Pornirea aplicației local**
-
+Pasul 5: Se pornește aplicația cu comanda:
 npm run dev
 
-
-4. **Accesarea aplicației**
-
-Se accesează aplicația la adresa: [http://localhost:3000](http://localhost:3000)
-
-## Utilizare
-
-- **Fără autentificare:**  
-Se pot efectua căutări de locații și vizualiza rezultatele în pagina dedicată.
-
-- **Autentificare:**  
-Se poate crea un cont nou (este necesară confirmarea acestuia prin e-mail).
-Alternativ, aplicația poate fi accesată cu următorul cont de test:
-
-**Email:** 2004.esty@gmail.com
-
-**Parolă:** parola_test
-
-- **Cu autentificare:**  
-Se pot salva locații la favorite, vizualiza istoricul căutărilor și accesa setările de profil.
+Pasul 6: Se accesează website-ul la adresa: http://localhost:3000
