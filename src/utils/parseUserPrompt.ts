@@ -11,7 +11,7 @@ export async function parseUserPrompt(prompt: string): Promise<ParsedPrompt> {
   const response = await axios.post(
     "https://openrouter.ai/api/v1/chat/completions",
     {
-      model: "openai/gpt-3.5-turbo",
+      model: "anthropic/claude-3-haiku",
       messages: [
         {
           role: "system",
@@ -28,11 +28,13 @@ export async function parseUserPrompt(prompt: string): Promise<ParsedPrompt> {
       headers: {
         "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://your-domain.com",
+        "HTTP-Referer": "http://localhost:3000",
         "X-Title": "QuickPick"
       }
     }
   );
+
+  
 
   const content = response.data.choices[0]?.message?.content;
   if (!content) throw new Error("Nu am primit raspuns de la API");

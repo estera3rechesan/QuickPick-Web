@@ -28,7 +28,6 @@ export async function POST(req: NextRequest) {
       Conform opiniilor fostilor clienti:
       - Puncte forte: ...
       - Dezavantaje: ...
-      Recenzii:
       ${reviewTexts.map((r: string, i: number) => `${i + 1}. "${r}"`).join("\n")}
     `;
 
@@ -40,7 +39,7 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
+        model: "anthropic/claude-3-haiku",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.3,
       }),

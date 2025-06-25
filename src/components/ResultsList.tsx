@@ -135,6 +135,7 @@ export default function ResultsList({ places }: ResultsListProps) {
                 ? "bg-[#93c572] text-white"
                 : "hover:bg-[#c9e2b8] text-[#353935]"}
             `}
+            onClick={() => setSortBy(filter.key as any)}
           >
             {filter.label}
           </button>
