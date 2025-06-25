@@ -6,6 +6,15 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+// Functie de validare a parolei
+function isPasswordValid(password: string): boolean {
+  if (password.length < 8) return false;
+  if (!/[a-z]/.test(password)) return false;
+  if (!/[A-Z]/.test(password)) return false;
+  if (!/\d/.test(password)) return false;
+  return true;
+}
+
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +30,13 @@ export default function SignupPage() {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
+
+    // Validare parola
+    if (!isPasswordValid(password)) {
+      setErrorMsg('Parola trebuie să aibă minim 8 caractere, să conțină litere mari, litere mici și cifre.');
+      return;
+    }
+
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
