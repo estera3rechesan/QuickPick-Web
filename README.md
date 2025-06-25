@@ -19,6 +19,7 @@ npm run dev
 
 
 4. **Accesarea aplicației**
+
 Se accesează aplicația la adresa: [http://localhost:3000](http://localhost:3000)
 
 ## Utilizare
@@ -29,7 +30,9 @@ Se pot efectua căutări de locații și vizualiza rezultatele în pagina dedica
 - **Autentificare:**  
 Se poate crea un cont nou (este necesară confirmarea acestuia prin e-mail).
 Alternativ, aplicația poate fi accesată cu următorul cont de test:
+
 **Email:** 2004.esty@gmail.com
+
 **Parolă:** parola_test
 
 - **Cu autentificare:**  
