@@ -6,6 +6,15 @@ import { createClient } from "@/utils/supabase/client";
 import LocationCard from "@/components/LocationCard"; 
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 
+// Functie de validare a parolei
+function isPasswordValid(password: string): boolean {
+  if (password.length < 8) return false;
+  if (!/[a-z]/.test(password)) return false;
+  if (!/[A-Z]/.test(password)) return false;
+  if (!/\d/.test(password)) return false;
+  return true;
+}
+
 //Structura unui obiect pentru o locatie favorita
 interface Favorite {
   id: number;
@@ -115,6 +124,13 @@ export default function AccountPage() {
     e.preventDefault();
     setInfoMsg(null);
     setErrorMsg(null);
+
+    // Validare parola noua
+    if (!isPasswordValid(newPassword)) {
+      setErrorMsg("Parola trebuie să aibă minim 8 caractere, să conțină litere mari, litere mici și cifre.");
+      return;
+    }
+
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) setErrorMsg(error.message);
     else setInfoMsg("Parola schimbata cu succes!");
