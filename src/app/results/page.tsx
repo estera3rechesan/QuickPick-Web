@@ -4,6 +4,7 @@ interface ResultsPageProps {
   searchParams: Promise<{ query?: string }>;
 }
 
+//Functie ce extrage lista de rezultate ("places") din raspunsul JSON si trimite lista de locuri catre ResultsList pentru afisare
 export default async function ResultsPage({ searchParams }: ResultsPageProps) {
   const { query = "" } = await searchParams;
 
@@ -26,7 +27,7 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
     throw new Error(`SearchPlaces API error: ${res.status} ${res.statusText}`);
   }
 
-  const { places } = await res.json();  // așteptăm { places: [...] }
+  const { places } = await res.json();
 
   return (
     <main className="pt-18 min-h-screen bg-[#FFECEC] p-4">
